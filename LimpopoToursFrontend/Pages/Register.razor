@@ -1,0 +1,76 @@
+﻿@page "/register"
+@using LimpopoToursFrontend.Models
+@using LimpopoToursFrontend.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white text-center">
+                    <h4>Register</h4>
+                </div>
+                <div class="card-body">
+
+                    @if (errorMessage != null)
+                    {
+                        <div class="alert alert-danger">@errorMessage</div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input class="form-control" placeholder="Enter full name"
+                               @bind="request.FullName" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input class="form-control" type="email" placeholder="Enter email"
+                               @bind="request.Email" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input class="form-control" type="password" placeholder="Enter password"
+                               @bind="request.Password" />
+                    </div>
+                    <button class="btn btn-success w-100" @onclick="HandleRegister">
+                        Register
+                    </button>
+                    <hr />
+                    <p class="text-center">
+                        Already have an account?
+                        <a href="/login">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterRequest request = new RegisterRequest();
+    private string? errorMessage;
+
+    private async Task HandleRegister()
+    {
+        errorMessage = null;
+
+        if (string.IsNullOrWhiteSpace(request.FullName) ||
+            string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Password))
+        {
+            errorMessage = "All fields are required.";
+            return;
+        }
+
+        var error = await AuthService.Register(request);
+        if (error == null)
+        {
+            Navigation.NavigateTo("/tours");
+        }
+        else
+        {
+            errorMessage = error;
+        }
+    }
+}
